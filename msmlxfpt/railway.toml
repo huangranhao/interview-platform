@@ -1,13 +1,9 @@
 # Railway 配置文件
 [build]
-builder = "nixpacks"
-
-[build.env]
-NIXPACKS_PYTHON_VERSION = "3.11"
-PIP_DEFAULT_TIMEOUT = "120"
+builder = "dockerfile"
 
 [deploy]
-startCommand = "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"
+startCommand = ""
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 5
 
@@ -17,4 +13,3 @@ DEBUG = "false"
 
 [[services]]
 name = "interview-platform"
-startCommand = "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"
