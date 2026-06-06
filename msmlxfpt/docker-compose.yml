@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # 应用服务
+  app:
+    build: .
+    container_name: interview-platform
+    restart: unless-stopped
+    environment:
+      - APP_ENV=production
+      - DATABASE_URL=sqlite:///./interview.db
+    volumes:
+      - ./interview.db:/app/interview.db
+    networks:
+      - interview-net
+    depends_on:
+      - nginx
+
+  # Nginx 反向代理
+  nginx:
+    image: nginx:alpine
+    container_name: interview-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    networks:
+      - interview-net
+
+  # Certbot 用于 SSL 证书
+  certbot:
+    image: certbot/certbot
+    container_name: interview-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot --email admin@hrh01.abrdns.com --agree-tos --no-eff-email -d hrh01.abrdns.com
+
+networks:
+  interview-net:
+    driver: bridge
